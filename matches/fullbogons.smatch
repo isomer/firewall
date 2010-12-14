@@ -1,0 +1,15 @@
+#!/bin/sh
+# This match fetches the list of full bogons from Team Cymru
+# 
+# IF YOU PLAN ON USING THIS YOU MUST REFRESH THIS LIST REGULARLY (pref daily)
+# THIS LIST UPDATES REGLARLY
+
+(
+wget -O- http://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt 2>/dev/null ;
+wget -O- http://www.team-cymru.org/Services/Bogons/fullbogons-ipv6.txt 2>/dev/null ;
+) | 
+	grep -v '^#' |
+	while read prefix; do
+		echo match --destination $prefix
+		echo match --source $prefix
+	done

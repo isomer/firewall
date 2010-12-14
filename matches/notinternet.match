@@ -1,0 +1,38 @@
+# This is a list of prefixes that shouldn't be routed across the public
+# internet.  It includes RFC1918 and other "internal" prefixes.
+
+# RFC 5735 -- "This network only"
+match --destination 0.0.0.0/8
+match --source 0.0.0.0/8
+# RFC 3735/RFC 1918 
+match --destination 10.0.0.0/8
+match --source 10.0.0.0/8
+# RFC 5735 -- "Loopback"
+match --destination 127.0.0.0/8
+match --source 127.0.0.0/8
+# RFC 5735 -- "Link Local"
+match --destination 169.254.0.0/16
+match --source 169.254.0.0/16
+# RFC 5735/RFC 1918 
+match --destination 172.16.0.0/12
+match --source 172.16.0.0/12
+# RFC 5735 -- TEST-NET-1 (Documentation/Examples only)
+match --destination 192.0.2.0/24
+match --source 192.0.2.0/24
+# RFC 5735/RFC 1918
+match --destination 192.168.0.0/16
+match --source 192.168.0.0/16
+# RFC 5735 -- "Performance testing"
+match --destination 198.18.0.0/15
+match --source 198.18.0.0/15
+# RFC 5735 -- TEST-NET-2 (Documentation/Examples only)
+match --destination 198.51.100.0/24
+match --source 198.51.100.0/24
+# RFC 5735 -- TEST-NET-3 (Documentation/Examples only)
+match --destination 203.0.113.0/24
+match --source 203.0.113.0/24
+# RFC 5735 -- Class E Experimental
+match --destination 240.0.0.0/4
+match --source 240.0.0.0/4
+
+

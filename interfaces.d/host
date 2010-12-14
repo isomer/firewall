@@ -1,0 +1,106 @@
+chain mangle pre-prerouting-in
+chain mangle post-prerouting-in
+
+chain nat pre-prerouting-in
+chain nat post-prerouting-in
+
+chain mangle pre-in
+chain mangle post-in
+
+chain filter pre-in
+policy ACCEPT --source 10.1.20.0/24
+policy REJECT --source 192.88.99.0/24
+chain filter post-in
+
+chain mangle pre-forward
+chain mangle post-forward
+
+chain filter pre-forward
+policy ACCEPT --source 10.1.20.0/24
+
+chain filter post-forward
+policy REJECT 
+
+chain mangle pre-out
+chain mangle post-out
+
+chain nat pre-out
+chain nat post-out
+
+chain filter pre-out
+chain filter post-out
+
+chain mangle pre-postrouting-out
+chain mangle post-postrouting-out
+
+chain nat pre-postrouting-out
+chain nat post-postrouting-out
+
+# Global host options
+#ip4_feature default_ttl
+#ip4_feature dynaddr
+#ip4_feature forward
+#ip4_feature local_port_range
+#ip4_feature nonlocal_bind
+#ip4_feature no_pmtu_disc
+
+#tcp_feature abc
+#tcp_feature abort_on_overflow
+#tcp_feature adv_win_scale
+#tcp_feature allowed_congestion_control
+#tcp_feature app_win
+#tcp_feature available_congestion_control
+#tcp_feature base_mss
+#tcp_feature congestion_control
+#tcp_feature dma_copybreak
+#tcp_feature dsack
+#tcp_feature ecn
+#tcp_feature fack
+#tcp_feature fin_timeout
+#tcp_feature frto
+#tcp_feature frto_response
+#tcp_feature keepalive_intvl
+#tcp_feature keepalive_probes
+#tcp_feature keepalive_time
+#tcp_feature low_latency
+#tcp_feature max_orphans
+#tcp_feature max_ssthresh
+#tcp_feature max_syn_backlog
+#tcp_feature max_tw_buckets
+#tcp_feature mem
+#tcp_feature moderate_rcvbuf
+#tcp_feature mtu_probing
+#tcp_feature no_metrics_save
+#tcp_feature orphan_retries
+#tcp_feature reordering
+#tcp_feature retrans_collapse
+#tcp_feature retries1
+#tcp_feature retries2
+#tcp_feature rfc1337
+#tcp_feature rmem
+#tcp_feature sack
+#tcp_feature slow_start_after_idle
+#tcp_feature stdurg
+#tcp_feature synack_retries
+#tcp_feature syncookies
+#tcp_feature syn_retries
+#tcp_feature timestamps
+#tcp_feature tso_win_divisor
+#tcp_feature tw_recycle
+#tcp_feature window_scaling
+#tcp_feature wmem
+#tcp_feature workaround_signed_windows
+
+#udp_feature mem
+#udp_feature rmem_min
+#udp_feature wmem_min
+
+#icmp_feature echo_ignore_all
+#icmp_feature echo_ignore_broacasts
+#icmp_feature errors_use_inbound_ifaddr
+#icmp_feature ignore_bogus_error_responses
+#icmp_feature ratelimit
+#icmp_feature ratemask
+
+# You can put other if4,ip6,neigh4 and neigh6 features in here from *.if, and
+# they will become the default for new interfaces.

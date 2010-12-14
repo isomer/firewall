@@ -1,0 +1,8 @@
+match --protocol tcp --destination-port smtp
+match --protocol tcp --destination-port ssmtp
+match --protocol tcp --destination-port submission
+match --protocol tcp --destination-port imap3
+match --protocol tcp --destination-port imaps
+match --protocol tcp --destination-port pop3
+match --protocol tcp --destination-port pop3s
+match --protocol tcp --destination-port sieve

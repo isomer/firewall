@@ -1,0 +1,4 @@
+# Protocols that you shouldn't want people to see by default.
+match --protocol tcp --destination-port 445
+match --protocol udp --destination-port 445
+match --protocol udp --destination-port 111

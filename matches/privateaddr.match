@@ -1,0 +1,9 @@
+# RFC1918 addresses
+match 192.168.0.0/16
+match 10.0.0.0/8
+match 172.16.0.0/12
+# Link locals
+match fe80::/16
+# Unique Local Addressing (ULA)
+match fc00::/7
+

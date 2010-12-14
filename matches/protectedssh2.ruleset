@@ -1,0 +1,18 @@
+
+# Protect SSH against brute force attacks by limiting a single IP to 
+# 30 connections per 10 minutes.  This requires the "recent" netfilter module
+# which is not generally available in generic kernel sources.
+
+# Apply a list of networks you want to be trusted and never to get locked out
+# Beware, of course these networks /can/ brute force your connection. :P
+#policy ACCEPT --protocol tcp --destination-port ssh --source 130.217.250.0/24
+
+# Anyone who has sent us more than 30 SYN's in the last 10 minutes
+# We limit to people who have the same ttl to try and avoid spoofed DoS 
+# attacks locking ourselves out
+policy REJECT --protocol tcp --destination-port ssh \
+	--syn \
+	-m recent --name "ssh" --update --seconds 600 --hitcount 30 --rttl
+
+# And anyone else can use tcp.
+policy ACCEPT --protocol tcp --destination-port ssh

@@ -1,0 +1,8 @@
+
+name.match is expanded with $name                                               
+each line generates one new rule
+
+name.smatch is executed with $name
+stdout is expected to have the same syntax as a match file (as above).
+
+There are some built in variables

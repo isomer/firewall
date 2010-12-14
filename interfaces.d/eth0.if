@@ -1,0 +1,155 @@
+set foo 42
+
+chain mangle prerouting-in
+
+chain nat prerouting-in
+
+chain mangle in
+policy DROP --protocol tcp --source $eth0.network --dport $foo
+
+chain filter in
+policy REJECT --destination $privateaddr
+policy ACCEPT --protocol $foo
+policy ACCEPT --protocol tcp --dport 22
+policy ACCEPT -p tcp --dport 53
+policy ACCEPT --source 0.0.0.0/0 --protocol tcp --dport 80
+policy ACCEPT --source 2000::/3 --protocol udp --dport 80    
+policy DROP $notinternet
+policy ACCEPT $webserver
+
+chain mangle forward-in
+
+chain mangle forward-out
+
+chain filter forward-in
+policy DROP $bogons
+policy REJECT $badpackets
+policy ACCEPT --source 10.1.0.0/16
+
+
+chain filter forward-out
+policy REJECT $badpackets
+policy ACCEPT --destination 10.1.0.0/16
+
+chain mangle out
+
+chain nat out
+
+chain filter out
+
+chain mangle postrouting-out
+
+chain nat postrouting-out
+
+ingress {
+	match loadavg_15 > 1 and source 10.0.0.0/8 {
+		action police --rate 5kbit --burst 10k --action=drop
+	}
+	match --fwmark 12 {
+		action police --rate 12kbit --burst 10k --action=drop
+	}
+	match --all {
+		action police --rate 120kbit --burst 10k --action=drop
+		action mirred --ingress --mirror --dev=ifb0
+	}
+}
+
+egress {
+	queue htb {
+		class --rate 120kbit --burst 10 {
+			match --source-port 80 --protocol 6 --fwmark 60
+			match --source-port 22 --protocol 6 --fwmark 60
+			queue pfifo --length 10
+		}
+		class --rate 64kbit --burst 10 {
+			match --dest-port 6667
+			queue --netem --corrupt 0.1%
+		}
+		class --rate 256kbit --burst 10 {
+			queue sfq --perturb 10 --quantum 1500
+		}
+	}
+}
+
+#if4_feature accept_redirects 
+#if4_feature accept_source_route 
+#if4_feature arp_accept 
+#if4_feature arp_announce 
+#if4_feature arp_filter 
+#if4_feature arp_ignore
+#if4_feature arp_notify 
+#if4_feature bootp_relay 
+#if4_feature disable_policy
+#if4_feature disable_xfrm
+#if4_feature force_igmp_version
+if4_feature forwarding 1
+if4_feature log_martians 1
+#if4_feature mc_forwarding
+#if4_feature medium_id
+#if4_feature promote_secondaries 
+#if4_feature proxy_arp 0
+#if4_feature rp_filter 0
+#if4_feature secure_redirects 
+#if4_feature send_redirects
+#if4_feature shared_media
+#if4_feature tag
+
+#neigh4_feature anycast_delay
+#neigh4_feature app_solicit
+#neigh4_feature base_reachable_time
+#neigh4_feature base_reachable_time_ms
+#neigh4_feature delay_first_probe_time
+#neigh4_feature gc_stale_time
+#neigh4_feature locktime
+#neigh4_feature mcast_solicit
+#neigh4_feature proxy_delay
+#neigh4_feature proxy_qlen
+#neigh4_feature retrans_time
+#neigh4_feature retrans_time_ms
+#neigh4_feature ucast_solicit
+#neigh4_feature unres_qlen
+
+#if6_feature accept_dad
+#if6_feature accept_ra
+#if6_feature accept_ra_defrtr
+#if6_feature accept_ra_pinfo
+#if6_feature accept_ra_rt_info_max_plen
+#if6_feature accept_ra_rtr_pref
+#if6_feature accept_redirects
+#if6_feature accept_source_route
+#if6_feature autoconf
+#if6_feature dad_transmits
+#if6_feature disable_ipv6
+#if6_feature force_mld_version
+#if6_feature forwarding
+#if6_feature hop_limit
+#if6_feature max_addresses
+#if6_feature max_desync_factor
+#if6_feature mc_forwarding
+#if6_feature mtu
+#if6_feature optimistic_dad
+#if6_feature proxy_ndp
+#if6_feature regen_max_retry
+#if6_feature router_probe_interval
+#if6_feature router_solicitations
+#if6_feature temp_prefered_lft
+#if6_feature temp_valid_lft
+#if6_feature use_tempaddr
+
+#neigh6_feature anycast_delay
+#neigh6_feature app_solicit
+#neigh6_feature base_reachable_time
+#neigh6_feature base_reachable_time_ms
+#neigh6_feature delay_first_probe_time
+#neigh6_feature gc_stale_time
+#neigh6_feature locktime
+#neigh6_feature mcast_solicit
+#neigh6_feature proxy_delay
+#neigh6_feature proxy_qlen
+#neigh6_feature retrans_time
+#neigh6_feature retrans_time_ms
+#neigh6_feature ucast_solicit
+#neigh6_feature unres_qlen
+
+
+

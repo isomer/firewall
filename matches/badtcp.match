@@ -1,0 +1,17 @@
+# TCP connections that don't start with a SYN
+match --protocol tcp ! --syn --match state --state NEW
+
+# Packets that don't have any of SYN/ACK/FIN/RST/PSH set
+match --protocol tcp --tcp-flags SYN,ACK,FIN,RST NONE
+
+# Invalid combinations of flags
+match --protocol tcp --tcp-flags SYN,FIN SYN,FIN
+match --protocol tcp --tcp-flags SYN,RST SYN,RST
+match --protocol tcp --tcp-flags SYN,PSH SYN,PSH
+match --protocol tcp --tcp-flags FIN,RST FIN,RST
+match --protocol tcp --tcp-flags FIN,URG FIN,URG
+match --protocol tcp --tcp-flags SYN,URG SYN,URG
+match --protocol tcp --tcp-flags RST,URG RST,URG
+match --protocol tcp --tcp-flags FIN,ACK FIN
+
+

@@ -1,0 +1,21 @@
+
+# Protect SSH against brute force attacks by rate limiting ssh connections
+# to 1 a minute (with an extra burst of 10 connections)
+#
+# This version doesn't use the "recent" module, which means that this is a
+# global limit applied to all addresses.  If one user spams your ssh port,
+# you won't be able to login at the same time unless you come from a trusted
+# netblock.
+
+# Apply a list of networks you want to be trusted and never to get locked out
+policy ACCEPT --protocol tcp --destination-port ssh --source 130.217.0.0/16
+policy ACCEPT --protocol tcp --destination-port ssh --source $privateaddr
+
+# If we're receiving too many ssh connection attempts, throttle them.
+policy REJECT --protocol tcp --destination-port ssh \
+	--syn \
+	-m limit --limit 1/minute --limit-burst 10
+
+# And anyone else can use tcp.
+policy ACCEPT --protocol tcp --destination-port ssh
+

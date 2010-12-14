@@ -1,0 +1,6 @@
+# Trusted connections
+
+# Connections that already exists
+match --match conntrack --ctstate ESTABLISHED,RELATED
+# Connections that were expected
+match --match conntract --ctstatus EXPECTED 

@@ -1,0 +1,2 @@
+match --protocol udp --port domain
+match --protocol tcp --port domain

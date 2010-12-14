@@ -1,0 +1,7 @@
+#!/bin/sh
+# This match fetches the list of bogons from Team Cymru
+wget -O- http://www.team-cymru.org/Services/Bogons/bogon-bn-agg.txt 2>/dev/null |
+	while read prefix; do
+		echo match --destination $prefix
+		echo match --source $prefix
+	done
