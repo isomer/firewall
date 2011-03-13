@@ -14,7 +14,7 @@ def add_rule(table,chain,rule):
 	rules[table][chain].append(rule)
 
 def add_table(table):
-	assert table not in rules
+	assert table not in rules, 'table %r already exists' % (table,)
 	rules[table]={}
 
 def add_chain(table,chain):
@@ -74,5 +74,12 @@ def extract(filter_to_reject,rules):
 	return ret
 
 def extract_v4(rules): return extract(filter_v6, rules)
-def extract_v6(rules): return extract(filter_v4, rules)
+
+def extract_v6(rules):
+	rules = extract(filter_v4, rules)
+	if rules['nat'] != {'PREROUTING':[], 'POSTROUTING':[], 'OUTPUT': []}:
+		print rules['nat']
+		raise Error('IPv6 does not support NAT')
+	del rules['nat']
+	return rules
 
