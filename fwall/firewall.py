@@ -15,7 +15,7 @@ import fwall.iptables
 import fwall.qos
 import fwall.expandos
 
-DEBUG=0
+DEBUG=1
 OPTIMISE=1
 
 
@@ -209,54 +209,6 @@ def parse_hostfile(fname):
 			"fw-host-pre-postrouting-out" : "fw-interface-postrouting-out",
 		},
 	}
-	fwall.iptables.add_chain("filter","fw-host-pre-in")
-	fwall.iptables.add_chain("filter","fw-host-pre-forward")
-	fwall.iptables.add_chain("filter","fw-host-pre-out")
-	fwall.iptables.add_chain("filter","fw-interface-in")
-	fwall.iptables.add_chain("filter","fw-interface-forward-in")
-	fwall.iptables.add_chain("filter","fw-interface-forward-out")
-	fwall.iptables.add_chain("filter","fw-interface-out")
-	fwall.iptables.add_chain("filter","fw-host-post-in")
-	fwall.iptables.add_chain("filter","fw-host-post-forward")
-	fwall.iptables.add_chain("filter","fw-host-post-out")
-	fwall.iptables.add_rule("filter","INPUT",["fw-host-pre-in"])
-	fwall.iptables.add_rule("filter","OUTPUT",["fw-host-pre-out"])
-	fwall.iptables.add_rule("filter","FORWARD",["fw-host-pre-forward"])
-
-	fwall.iptables.add_chain("nat","fw-host-pre-prerouting-in")
-	fwall.iptables.add_chain("nat","fw-interface-prerouting-in")
-	fwall.iptables.add_chain("nat","fw-host-post-prerouting-in")
-	fwall.iptables.add_chain("nat","fw-host-pre-postrouting-out")
-	fwall.iptables.add_chain("nat","fw-interface-postrouting-out")
-	fwall.iptables.add_chain("nat","fw-host-post-postrouting-out")
-	fwall.iptables.add_chain("nat","fw-host-pre-out")
-	fwall.iptables.add_chain("nat","fw-interface-out")
-	fwall.iptables.add_chain("nat","fw-host-post-out")
-	fwall.iptables.add_rule("nat","PREROUTING",["fw-host-pre-prerouting-in"])
-	fwall.iptables.add_rule("nat","POSTROUTING",["fw-host-pre-postrouting-out"])
-	fwall.iptables.add_rule("nat","OUTPUT",["fw-host-pre-out"])
-
-	fwall.iptables.add_chain("mangle","fw-host-pre-prerouting-in")
-	fwall.iptables.add_chain("mangle","fw-interface-prerouting-in")
-	fwall.iptables.add_chain("mangle","fw-host-post-prerouting-in")
-	fwall.iptables.add_chain("mangle","fw-host-pre-in")
-	fwall.iptables.add_chain("mangle","fw-interface-in")
-	fwall.iptables.add_chain("mangle","fw-host-post-in")
-	fwall.iptables.add_chain("mangle","fw-host-pre-forward")
-	fwall.iptables.add_chain("mangle","fw-interface-forward-in")
-	fwall.iptables.add_chain("mangle","fw-interface-forward-out")
-	fwall.iptables.add_chain("mangle","fw-host-post-forward")
-	fwall.iptables.add_chain("mangle","fw-host-pre-out")
-	fwall.iptables.add_chain("mangle","fw-interface-out")
-	fwall.iptables.add_chain("mangle","fw-host-post-out")
-	fwall.iptables.add_chain("mangle","fw-host-pre-postrouting-out")
-	fwall.iptables.add_chain("mangle","fw-interface-postrouting-out")
-	fwall.iptables.add_chain("mangle","fw-host-post-postrouting-out")
-	fwall.iptables.add_rule("mangle","PREROUTING",["fw-host-pre-prerouting-in"])
-	fwall.iptables.add_rule("mangle","INPUT",["fw-host-pre-in"])
-	fwall.iptables.add_rule("mangle","FORWARD",["fw-host-pre-forward"])
-	fwall.iptables.add_rule("mangle","OUTPUT",["fw-host-pre-out"])
-	fwall.iptables.add_rule("mangle","POSTROUTING",["fw-host-pre-postrouting-out"])
 
 	parse_rulesfile(fname,"default",chainmapping,acceptmapping)
 
@@ -381,6 +333,7 @@ def validate_tables(rules):
 
 def optimise_singleton_chains(rules,table):
 	# Find all the chains that have one singular rule, or empty
+	# and remove them.
 	change=False
 	singleton_chains={}
 	for chain in rules[table]:
@@ -466,7 +419,6 @@ def create_groups_from_chains(rules,table):
 				group = [rule[1:]]
 				target = rule[0]
 		assert target is not None or group==[]
-		#print rules[table][chain]
 		group = optimise_group(rules,table,chain,group)
 		assert target is not None or group==[]
 		newrules += [[target]+x for x in group]
@@ -524,6 +476,54 @@ def create_default_rules():
 	fwall.iptables.add_rule("mangle","fw-interface-out",["fw-host-post-out"])
 	fwall.iptables.add_rule("mangle","fw-host-pre-postrouting-out",["fw-interface-postrouting-out"])
 	fwall.iptables.add_rule("mangle","fw-interface-postrouting-out",["fw-host-post-postrouting-out"])
+	fwall.iptables.add_chain("filter","fw-host-pre-in")
+	fwall.iptables.add_chain("filter","fw-host-pre-forward")
+	fwall.iptables.add_chain("filter","fw-host-pre-out")
+	fwall.iptables.add_chain("filter","fw-interface-in")
+	fwall.iptables.add_chain("filter","fw-interface-forward-in")
+	fwall.iptables.add_chain("filter","fw-interface-forward-out")
+	fwall.iptables.add_chain("filter","fw-interface-out")
+	fwall.iptables.add_chain("filter","fw-host-post-in")
+	fwall.iptables.add_chain("filter","fw-host-post-forward")
+	fwall.iptables.add_chain("filter","fw-host-post-out")
+	fwall.iptables.add_rule("filter","INPUT",["fw-host-pre-in"])
+	fwall.iptables.add_rule("filter","OUTPUT",["fw-host-pre-out"])
+	fwall.iptables.add_rule("filter","FORWARD",["fw-host-pre-forward"])
+
+	fwall.iptables.add_chain("nat","fw-host-pre-prerouting-in")
+	fwall.iptables.add_chain("nat","fw-interface-prerouting-in")
+	fwall.iptables.add_chain("nat","fw-host-post-prerouting-in")
+	fwall.iptables.add_chain("nat","fw-host-pre-postrouting-out")
+	fwall.iptables.add_chain("nat","fw-interface-postrouting-out")
+	fwall.iptables.add_chain("nat","fw-host-post-postrouting-out")
+	fwall.iptables.add_chain("nat","fw-host-pre-out")
+	fwall.iptables.add_chain("nat","fw-interface-out")
+	fwall.iptables.add_chain("nat","fw-host-post-out")
+	fwall.iptables.add_rule("nat","PREROUTING",["fw-host-pre-prerouting-in"])
+	fwall.iptables.add_rule("nat","POSTROUTING",["fw-host-pre-postrouting-out"])
+	fwall.iptables.add_rule("nat","OUTPUT",["fw-host-pre-out"])
+
+	fwall.iptables.add_chain("mangle","fw-host-pre-prerouting-in")
+	fwall.iptables.add_chain("mangle","fw-interface-prerouting-in")
+	fwall.iptables.add_chain("mangle","fw-host-post-prerouting-in")
+	fwall.iptables.add_chain("mangle","fw-host-pre-in")
+	fwall.iptables.add_chain("mangle","fw-interface-in")
+	fwall.iptables.add_chain("mangle","fw-host-post-in")
+	fwall.iptables.add_chain("mangle","fw-host-pre-forward")
+	fwall.iptables.add_chain("mangle","fw-interface-forward-in")
+	fwall.iptables.add_chain("mangle","fw-interface-forward-out")
+	fwall.iptables.add_chain("mangle","fw-host-post-forward")
+	fwall.iptables.add_chain("mangle","fw-host-pre-out")
+	fwall.iptables.add_chain("mangle","fw-interface-out")
+	fwall.iptables.add_chain("mangle","fw-host-post-out")
+	fwall.iptables.add_chain("mangle","fw-host-pre-postrouting-out")
+	fwall.iptables.add_chain("mangle","fw-interface-postrouting-out")
+	fwall.iptables.add_chain("mangle","fw-host-post-postrouting-out")
+	fwall.iptables.add_rule("mangle","PREROUTING",["fw-host-pre-prerouting-in"])
+	fwall.iptables.add_rule("mangle","INPUT",["fw-host-pre-in"])
+	fwall.iptables.add_rule("mangle","FORWARD",["fw-host-pre-forward"])
+	fwall.iptables.add_rule("mangle","OUTPUT",["fw-host-pre-out"])
+	fwall.iptables.add_rule("mangle","POSTROUTING",["fw-host-pre-postrouting-out"])
 
 def add_expandos(argv):
 	for i in argv[1:]:
