@@ -4,10 +4,7 @@ import os
 import shlex
 import re
 
-MATCHES_DIR="matches"
-
 rules={}
-loaded_expandos={}
 
 def add_rule(table,chain,rule):
 	if table not in rules:
@@ -25,43 +22,13 @@ def add_chain(table,chain):
 	assert chain not in rules[table]
 	rules[table][chain]=[]
 
-def load_match(name):
-	if os.path.exists(os.path.join(MATCHES_DIR,name+".match")):
-		f=open(os.path.join(MATCHES_DIR,name+".match"),"r")
-	elif os.path.exists(os.path.join(MATCHES_DIR,name+".smatch")):
-		f=os.popen(os.path.join(MATCHES_DIR,name+".smatch"),"r")
-	else:
-		error("Unknown match %r" % name)
-	ret=[]
-	for line in f:
-		words=shlex.split(line,comments=True)
-		if words==[]:
-			continue
-		if words[0]=="match":
-			ret.append(words[1:])	
-		else:
-			error("Unknown config option %r in match %r" %
-				(words[0],name))
-	return ret
-
-def compile_match(name):
-	return load_match(name)
-
-def expand_match(name):
-	if "." in name:
-		object,property = name.split(".",1)
-		if property=="network":
-			return [[expandos.get_ifnetwork(object)]]
-	if name not in loaded_expandos:
-		loaded_expandos[name]=compile_match(name)
-	return loaded_expandos[name]
 
 def expand_matches(args):
 	if args==[]:
 		yield []
 		return
 	if args[0][0]=="$":
-		for i in expand_match(args[0][1:]):
+		for i in expandos.expand_match(args[0][1:]):
 			for j in expand_matches(args[1:]):
 				yield i+j
 	else:
